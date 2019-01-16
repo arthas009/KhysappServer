@@ -41,7 +41,6 @@ public class ClientThread extends Thread {
                 e.printStackTrace();
                 break;
             }
-
                 if (str.startsWith("LogIn:")) {
                     System.out.println("Oh, a Log in request. Checking..");
                     sfuncts.LogIn(out, str);
