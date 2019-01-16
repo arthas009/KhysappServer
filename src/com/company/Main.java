@@ -15,17 +15,13 @@ public class Main {
         ServerSocket serverSocket;
         Socket clientSocket;
         serverSocket = new ServerSocket(portNumber);
-        while (true)
-        {
+        while (true) {
             System.out.println("I listen");
-            try
-            {
+            try {
                 clientSocket = serverSocket.accept();
                 System.out.println("There is a request from client");
                 new ClientThread(clientSocket).start();
-            }
-            catch(Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
                 startListening(portNumber);
             }
