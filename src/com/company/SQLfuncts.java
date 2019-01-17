@@ -14,14 +14,14 @@ public class SQLfuncts {
         return rs;
     }
 
-    public void PrintUserValues(ResultSet rs) throws SQLException //JUST FOR INFORMATION FOR SERVER. PRINTS VALUES OF USER
+    public void PrintUserValues(ResultSet rs) throws SQLException //JUST FOR INFORMATION. PRINTS VALUES OF USER
     {
           /*   System.out.println("Your name: "+rs.getString("Name").trim());
              System.out.println("Your surname: "+rs.getString("Surname").trim());
              System.out.println("Your phone number: "+rs.getString("PhoneNumber").trim());
              System.out.println("Your position at company:"+ rs.getString("Position").trim());*/
     }
-
+    /* Inserting new user */
     public void InsertNewUser(Connection conn, String name, String surname,
                               String phonenumber, String username, String position,
                               String password, String datetime) throws SQLException // INSERTS A NEW USER
@@ -40,7 +40,7 @@ public class SQLfuncts {
 
     }
 
-    public String getOnlineUsers(Connection conn, String username) // WHEN USER REGISTERED, OPEN A NEW TABLE TO HIM/HER FOR CHAT INFO
+    public String getUsers(Connection conn, String username)
     {
         try {
             String returnValue = "";
@@ -60,7 +60,8 @@ public class SQLfuncts {
         }
     }
 
-    public int[] getIdOfTwouser(Connection conn, String[] Str) throws SQLException {
+    public int[] getIdOfTwouser(Connection conn, String[] Str) throws SQLException // BEFORE START CHATTING, FIND THE IDs OF USERS
+    {
         int[] IDs = new int[2];
         PreparedStatement stmt;
         ResultSet rs;

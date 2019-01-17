@@ -30,6 +30,7 @@ public class ClientThread extends Thread {
 
     public void respond() throws SQLException, ClassNotFoundException, IOException, InterruptedException {
         Serverfuncts sfuncts = new Serverfuncts();
+        /* READER AND WRITERS ON SOCKET */
         BufferedReader in = sfuncts.OpenBuffReader(socket);
         BufferedWriter BW = sfuncts.OpenBuffWriter(socket);
         PrintWriter out = new PrintWriter(BW, true);
@@ -41,23 +42,32 @@ public class ClientThread extends Thread {
                 e.printStackTrace();
                 break;
             }
+                /* IF CLIENT SENDS A LOGIN REQUEST, THIS SECTION WORKS*/
                 if (str.startsWith("LogIn:")) {
                     System.out.println("Oh, a Log in request. Checking..");
                     sfuncts.LogIn(out, str);
                     break;
-                } else if (str.startsWith("InsertUser:")) {
+                }
+                /* IF CLIENT SENDS A REGISTER REQUEST, THIS SECTION WORKS */
+                else if (str.startsWith("InsertUser:")) {
                     System.out.println("Oh, a Sign in request. Checking..");
                     sfuncts.InsertNewUser(out, str);
                     break;
-                } else if (str.startsWith("SendMessage:")) {
+                }
+                /* IF CLIENT SENDS A MESSAGE SENDING REQUEST, THIS SECTION WORKS */
+                else if (str.startsWith("SendMessage:")) {
                     System.out.println("Oh, a Send Message request. Checking..");
                     sfuncts.SendMessage(out, str);
                     break;
-                } else if (str.startsWith("DrawMessages:")) {
+                }
+                /* IF CLIENT SENDS A DRAW MESSAGES REQUEST, THIS SECTION WORKS */
+                else if (str.startsWith("DrawMessages:")) {
                     System.out.println("Oh, a Draw Messages request. Checking..");
                     sfuncts.DrawMessages(out, str);
                     break;
-                } else if (str.startsWith("CheckMessages:")) {
+                }
+                /* IF CLIENT SENDS A REQUEST FOR CHECKING MESSAGES AND BRING THEM, THIS SECTION WORKS */
+                else if (str.startsWith("CheckMessages:")) {
                     System.out.println("Oh, a CheckMessages request. Checking..");
                     sfuncts.CheckForMessages(out, str);
                     break;
