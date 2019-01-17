@@ -81,7 +81,7 @@ public class SQLfuncts {
         }
         return IDs;
     }
-
+/*
     public void setUserToOnline(Connection conn, String username) throws SQLException {
         PreparedStatement stmt;
         stmt = conn.prepareStatement("UPDATE users SET IsLogged='true' WHERE Username = ?");
@@ -95,6 +95,6 @@ public class SQLfuncts {
         stmt.setString(1, username);
         stmt.execute();
     }
-
+*/
 }
 

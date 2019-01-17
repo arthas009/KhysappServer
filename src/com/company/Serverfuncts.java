@@ -2,7 +2,6 @@ package com.company;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -34,31 +33,34 @@ public class Serverfuncts {
         Class.forName("com.mysql.jdbc.Driver");
         Connection connection = null;
         try {
+
             connection = (Connection) DriverManager.getConnection(MySQLinfo.url, MySQLinfo.username, MySQLinfo.password);
-            System.out.println("flag");
             SQLfuncts sqlfun = new SQLfuncts();
             ResultSet rs;
             rs = sqlfun.SearchForUser(connection, Str[0]);
+
             while (rs.next()) {
                 usercontrol = true; // USER IS EXISTS
                 if (rs.getString("Password").trim().equals(Str[1])) // CHECK IF PASSWORD EQUALS TO THE PASSWORD IN THE TABLE
                 {
-                    String message = "";
+                    String message = ""; // MESSAGE TO ACKNOWLEDGE CLIENT
                     message = sqlfun.getUsers(connection, Str[0]); // GET ALL USERS IN DATABASE
-                    message = message.substring(0, message.length() - 3);
+                    message = message.substring(0, message.length() - 3); // REMOVE LAST SPLITTER '///'
                     out.println("true:" + rs.getString("Name") + "///" + rs.getString("Surname") + "///" + message); //GIVE A RETURN TO CLIENT
                 }
                 else
                 {
-                    out.println("error");
+                    out.println("error"); // IF PASSWORD IS WRONG, TELL CLIENT THIS IS AN ERROR
                 }
             }
+
             if (!usercontrol) // IF USER NOT FOUND
             {
-                out.println("unf");
+                out.println("unf"); // TELL CLIENT USER NOT FOUND
             }
-            connection.close();
+            connection.close(); // CLOSE DATABASE CONNECTION
         } // CONNECTION TRY BLOCK
+
         catch (Exception e) {
             if (connection != null)
                 connection.close();
@@ -80,25 +82,29 @@ public class Serverfuncts {
         Class.forName("com.mysql.jdbc.Driver");
         Connection connection = null;
         try {
-            connection = (Connection) DriverManager.getConnection(MySQLinfo.url, MySQLinfo.username, MySQLinfo.password)
-            boolean control = false;
+            connection = (Connection) DriverManager.getConnection(MySQLinfo.url, MySQLinfo.username, MySQLinfo.password);
+            boolean control = false; // WE WILL USE THIS TO CHECK IF USERNAME ALREADY EXISTS
             SQLfuncts sqlfun = new SQLfuncts();
             ResultSet rs;
-            rs = sqlfun.SearchForUser(connection, Str[3]);
+            rs = sqlfun.SearchForUser(connection, Str[3]); // SEARCH THE USERNAME. IT IS AFTER 4. SPLITTER (IN STR[3]).
             while (rs.next()) {
-                control = true;
+                control = true; // USER FOUND, THIS MEANS WE CAN't INSERT THIS USERNAME
             }
             if (control) {
-                out.println("AnotherUserFound");
+                out.println("AnotherUserFound"); // TELL CLIENT THAT THERE IS ALREADY AN USER WITH THIS USERNAME
                 return;
             }
-            sqlfun.InsertNewUser(connection, Str[0], Str[1], Str[2], Str[3], Str[4], Str[5], Str[6]);
-            out.println("UserRegistered");
-            connection.close();
+            sqlfun.InsertNewUser(connection, Str[0], Str[1], Str[2], Str[3], Str[4], Str[5], Str[6]); // IF EVERYTHING WENT WELL, INSER THE USER
+            out.println("UserRegistered"); // SEND ACKNOWLEDGEMENT TO CLIENT THAT WE INSERTED THE NEW USER.
+            connection.close(); // CLOSE CONNECTION
         } catch (Exception e)
         {
-
+            if (connection != null)
+                connection.close();
+            e.printStackTrace();
+            return;
         }
+
     }
     /*   --THIS FUNCTION HANDLES THE SEND MESSAGE REQUESTS. INCOMING STRING INCLUDES SENDER USER ID, RECEIVER USER ID AND MESSAGE BODY
          --THE STRING COMES FROM CLIENT INCLUDES A HEADER LIKE SendMessage: AND A SPLITTER '///'
@@ -113,7 +119,7 @@ public class Serverfuncts {
         Class.forName("com.mysql.jdbc.Driver");
         Connection connection = null;
         try {
-            connection = (Connection) DriverManager.getConnection(MySQLinfo.url, MySQLinfo.username, MySQLinfo.password)
+            connection = (Connection) DriverManager.getConnection(MySQLinfo.url, MySQLinfo.username, MySQLinfo.password);
             SQLfuncts sqlfun = new SQLfuncts();
             IDs = sqlfun.getIdOfTwouser(connection, Str);
         }
@@ -163,28 +169,32 @@ public class Serverfuncts {
 
     }
 
-    /*   --THIS FUNCTION HANDLES THE SEND MESSAGE REQUESTS. INCOMING STRING INCLUDES SENDER USER ID, RECEIVER USER ID AND MESSAGE BODY
-         --THE STRING COMES FROM CLIENT INCLUDES A HEADER LIKE SendMessage: AND A SPLITTER '///'
+    /*   --THIS FUNCTION HANDLES THE DRAW MESSAGES REQUESTS. INCOMING STRING INCLUDES A HEADER AS 'DrawMessages:', SENDER USER ID, RECEIVER USER ID.
+         --THE STRING COMES FROM CLIENT INCLUDES A SPLITTER '///'
          --FIRSTLY, I AM REMOVING THE HEADER AND SPLITTING STRING INTO PARTS.
-         --THEN I PRINT MESSAGE TO FILES AND SENDING A ACKNOWLEDGENEMENT AS 'true:'
+         --THEN I AM REACHING THE MESSAGES FILE AND DRAING MESSAGES FROM FILES AND SENDING MESSAGES WITH AN HEADER 'true:' TO GIVE ACKNOWLEDGEMENT.
        */
-    public void DrawMessages(PrintWriter out, String str) throws SQLException, ClassNotFoundException, IOException, InterruptedException {
+    public void DrawMessages(PrintWriter out, String str) throws ClassNotFoundException, IOException, InterruptedException, SQLException {
 
         String[] Str;
         int[] IDs = new int[2];
-
         str = str.substring(13);
         Str = str.split("///");
-        //  System.out.println("File flag: now here 1");
-        //  for (String Str1 : Str)
-        // {
-        //  System.out.println(Str1); //STR[0] = ME STR[1] = OTHER;
-        //  }
         Class.forName("com.mysql.jdbc.Driver");
-        try (Connection connection = (Connection) DriverManager.getConnection(MySQLinfo.url, MySQLinfo.username, MySQLinfo.password)) {
+        Connection connection = null;
+        try {
+            connection = (Connection) DriverManager.getConnection(MySQLinfo.url, MySQLinfo.username, MySQLinfo.password);
             SQLfuncts sqlfun = new SQLfuncts();
             IDs = sqlfun.getIdOfTwouser(connection, Str);
         }
+        catch (Exception e)
+        {
+            if (connection != null)
+                connection.close();
+            e.printStackTrace();
+            return;
+        }
+
         String messagestosend = "";
         HandleFiles(IDs);
         Thread.sleep(5);
@@ -192,7 +202,6 @@ public class Serverfuncts {
         String readLine = "";
         PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("C:/Users/Yusuf/Documents/Chats/OldMessages/" + IDs[0] + "/" + IDs[1] + ".txt", true)));
         while ((readLine = b.readLine()) != null) {
-            // System.out.println(readLine);
             pw.println(readLine);
             pw.flush();
         }
@@ -203,10 +212,8 @@ public class Serverfuncts {
         readLine = "";
         Thread.sleep(5);
         while ((readLine = b2.readLine()) != null) {
-            //  System.out.println(readLine);
             messagestosend += readLine + "///";
         }
-
         b2.close();
         fr.close();
         out.println("true:" + messagestosend);
@@ -216,26 +223,29 @@ public class Serverfuncts {
 
 
     }
-
+    /*
+     --THIS FUNCTION DOES NEARLY SAME THING THAT DrawMessages FUNCTION DOES. NOT SO IMPORTANT
+    */
     public void CheckForMessages(PrintWriter out, String str) throws InterruptedException, SQLException, IOException, ClassNotFoundException {
         String[] Str;
         int[] IDs = new int[2];
 
         str = str.substring(14);
         Str = str.split("///");
-        //  for (String Str1 : Str)
-        //  {
-        //  System.out.println(Str1); //STR[0] = ME STR[1] = OTHER;
-        //  }
         Class.forName("com.mysql.jdbc.Driver");
-        String url = "jdbc:mysql://localhost:3306/chat";
-        String username = "javaapp";
-        String password = "javaapp";
-        try (Connection connection = (Connection) DriverManager.getConnection(url, username, password)) {
+        Connection connection = null;
+        try  {
+            connection = (Connection) DriverManager.getConnection(MySQLinfo.url, MySQLinfo.username, MySQLinfo.password);
             SQLfuncts sqlfun = new SQLfuncts();
             IDs = sqlfun.getIdOfTwouser(connection, Str);
         }
-
+        catch (Exception e)
+        {
+            if (connection != null)
+                connection.close();
+            e.printStackTrace();
+            return;
+        }
         boolean nmf = false;
         HandleFiles(IDs);
         Thread.sleep(5);
@@ -253,6 +263,7 @@ public class Serverfuncts {
     }
     ////////////////////********************------SECONDARY FUNCTIONS--------********////////////////////////////////////////////////////
 
+    // IF FILES DO NOT EXISTS, OPEN REQUIRED FILES.
     public void HandleFiles(int[] IDs) throws IOException // CHAT FILES TO OPEN
     {
         // System.out.println("File flag: now here 2");
