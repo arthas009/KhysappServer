@@ -4,6 +4,7 @@
     It's written in Intellij Idea.
     You need to have a running MySQL server in your computer to make program work.
     Sql export for chat users is in chat_users.sql . Import it to your mysql server. Your users table should look like this.
+    I'm using a spesific user while connecting to database server named "javaapp" and password "javaapp"
 ![alt text](https://github.com/arthas009/KhysappServer/blob/master/guidance/mysql.JPG)
     
     Program keeps the messages in txt files in a folder "Documents/Chats". Like this
